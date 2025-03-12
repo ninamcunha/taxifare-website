@@ -2,6 +2,38 @@ import streamlit as st
 import requests
 from datetime import datetime
 import pandas as pd
+import folium
+from streamlit_folium import folium_static
+
+# Custom CSS for gay flag header and pink button
+st.markdown(
+    """
+    <style>
+    /* Add a horizontal gay flag as a header */
+    .header {
+        width: 100%;
+        height: 50px;
+        background: linear-gradient(
+            to right,
+            #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D
+        );
+        margin-bottom: 20px;
+    }
+
+    /* Style the button */
+    .stButton button {
+        font-size: 20px !important;
+        background-color: #FF69B4 !important; /* Pink background */
+        color: white !important; /* White text */
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+    }
+    </style>
+    <div class="header"></div>
+    """,
+    unsafe_allow_html=True
+)
 
 st.title("Taxi Fare Predictor")
 
@@ -29,7 +61,24 @@ map_data = pd.DataFrame({
 
 # Display the map
 st.markdown("### Ride Locations on Map")
-st.map(map_data)  # Render the map using the DataFrame
+#st.map(map_data)  # Render the map using the DataFrame
+m = folium.Map(location=[pickup_latitude, pickup_longitude], zoom_start=13)
+
+# Add markers for pickup and dropoff locations
+folium.Marker(
+    location=[pickup_latitude, pickup_longitude],
+    popup="Pickup Location",
+    icon=folium.Icon(color="green", icon="info-sign")
+).add_to(m)
+
+folium.Marker(
+    location=[dropoff_latitude, dropoff_longitude],
+    popup="Dropoff Location",
+    icon=folium.Icon(color="red", icon="info-sign")
+).add_to(m)
+
+# Display the folium map
+folium_static(m)
 
 # API URL
 url = 'https://taxifare.lewagon.ai/predict'
